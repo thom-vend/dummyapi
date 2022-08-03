@@ -1,0 +1,7 @@
+#cloud-config
+package_update: false
+package_upgrade: false
+package_reboot_if_required: false
+
+runcmd:
+  - curl -sSfL "https://raw.githubusercontent.com/thom-vend/dummyapi/main/setup-golang.sh" |bash
