@@ -1,4 +1,4 @@
-module github.com/vend/mini-api-benchmark
+module github.com/thom-vend/dummyapi
 
 go 1.18
 

@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,19 +29,37 @@ func main() {
 
 func hitmeHandler(url string) gin.HandlerFunc {
 	fn := func(c *gin.Context) {
-		status := 500
-		msg := "error"
-		data, err := http.Get(url)
+		status := 200
+		msg := ""
+		data, err := get(url)
 		if err == nil {
-			body, err := ioutil.ReadAll(data.Body)
-			if err == nil {
-				status = 200
-				msg = string(body)
-			}
+			msg = data
+		} else {
+			status = 500
+			msg = err.Error()
 		}
 		c.JSON(status, gin.H{
 			"message": msg,
 		})
 	}
 	return gin.HandlerFunc(fn)
+}
+func get(url string) (string, error) {
+	client := &http.Client{
+		Timeout: time.Second * 10,
+	}
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return "", err
+	}
+	req.Header.Add("lbonly", "yes")
+	response, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return "", err
+	}
+	return string(body), nil
 }
